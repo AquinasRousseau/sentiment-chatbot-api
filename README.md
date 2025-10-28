@@ -15,4 +15,4 @@ Example: curl -X POST ... -d '{"message": "Fees too high!"}'
 - Sentiment: Transformers + TF 2.20
 - Responses: LangChain + GPT-4o-mini
 
-Built by [Your Name]—AI integration specialist.
+Built by [Anthony Rousseau]—AI integration specialist.
