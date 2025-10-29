@@ -4,7 +4,7 @@ import os
 import re  # New: For robust extraction
 
 # No load_dotenv()—Vercel uses direct env vars
-llm = ChatOpenAI(api_key=os.getenv('OPENAI_API_KEY'), model="gpt-3.5-turbo", temperature=0)
+llm = ChatOpenAI(api_key=os.getenv('OPENAI_API_KEY'), model="gpt-4o-mini", temperature=0)
 
 prompt = PromptTemplate(
     input_variables=["text"],
@@ -50,4 +50,5 @@ def analyze_sentiment(text):
     except Exception as e:
         print(f"Sentiment error: {e}")  # For logs
         return 'neutral'
+
 
