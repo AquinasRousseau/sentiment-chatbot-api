@@ -1,8 +1,10 @@
 import os
+import time  # New: For rate-limit sleep
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain.prompts import PromptTemplate
-import re  # For robust extraction
+import re
+import logging  # For structured Vercel logs
 
 load_dotenv()
 
@@ -34,20 +36,20 @@ Sentiment:"""
 chain = prompt | llm
 
 def analyze_sentiment(text):
-    sentiment = 'neutral'  # Default outside try for safety
+    sentiment = 'neutral'  # Default—always set
+    match = None  # New: Declare early to avoid scope error
     try:
         result = chain.invoke({"text": text})
         raw_output = result.content.strip()
-        print(f"Raw LLM output for '{text}': '{raw_output}'")  # Your existing debug
+        logging.info(f"Raw LLM output for '{text}': '{raw_output}'")  # Use logging for Vercel
         
-        # Robust extraction: Look for the sentiment word via regex (case-insensitive)
-        match = re.search(r'\b(positive|negative|neutral)\b', raw_output.lower())
+        # Robust extraction: Regex for sentiment word (handles punctuation)
+        match = re.search(r'\b(positive|negative|neutral)[.!?]?\b', raw_output.lower())
         if match:
-            sentiment = match.group(1)
-            print(f"Regex extracted: '{sentiment}'")  # New: Log the win
-        
-        # Expanded fallback: Scan whole output for keywords (only if regex misses)
+            sentiment = match.group(1).strip(' .!?,')
+            logging.info(f"Regex extracted: '{sentiment}'")
         else:
+            # Fallback keywords (only if regex misses)
             output_lower = raw_output.lower()
             if any(word in output_lower for word in ['love', 'great', 'awesome', 'happy', 'pos']):
                 sentiment = 'positive'
@@ -55,18 +57,24 @@ def analyze_sentiment(text):
                 sentiment = 'negative'
             else:
                 sentiment = 'neutral'
-            print(f"Fallback extracted: '{sentiment}'")  # Log fallback use
+            logging.info(f"Fallback extracted: '{sentiment}'")
         
-        print(f"Final sentiment for '{text}': '{sentiment}'")  # Overall log
+        logging.info(f"Final sentiment for '{text}': '{sentiment}'")
         
     except Exception as e:
-        print(f"Sentiment error: {e}")
-        sentiment = 'neutral'  # Ensure it's set even on error
+        logging.error(f"Sentiment error: {e}")
+        # No need for match here—sentiment already defaulted
+        if "429" in str(e):  # Rate limit catch
+            logging.warning("Rate limited—sleeping 30s before retry")
+            time.sleep(30)  # Backoff; adjust as needed
+            # Optional: Retry once? Add recursive call if you want.
+        sentiment = 'neutral'
     
     return sentiment
 
 # Standalone test
 if __name__ == "__main__":
-    print(analyze_sentiment("Love the new features!"))  # positive
-    print(analyze_sentiment("How do I reset password?"))  # neutral
-    print(analyze_sentiment("Fees too high—frustrated!"))  # negative
+    print(analyze_sentiment("Love the new features!"))
+    print(analyze_sentiment("How do I reset password?"))
+    print(analyze_sentiment("Fees too high—frustrated!"))
+
