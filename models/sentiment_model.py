@@ -30,11 +30,12 @@ chain = prompt | llm
 def analyze_sentiment(text):
     try:
         result = chain.invoke({"text": text})
-        raw_output = result.content.strip()
-        # print(f"Raw LLM output for '{text}': '{raw_output}'")  # Uncomment for debug
+        raw_output = result.content.strip()  # Add this line
+        print(f"Raw LLM output for '{text}': '{raw_output}'")  # Debug print
         
-        # Robust extraction: Look for the sentiment word via regex (case-insensitive)
-        match = re.search(r'\b(positive|negative|neutral)\b', raw_output.lower())
+        output = raw_output.lower()
+        # ... rest of your code
+   
         if match:
             return match.group(1)
         
@@ -49,3 +50,4 @@ def analyze_sentiment(text):
     except Exception as e:
         print(f"Sentiment error: {e}")  # For logs
         return 'neutral'
+
