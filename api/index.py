@@ -176,43 +176,44 @@ def analyze_chat():
     intent = detect_intent(user_message)
     logger.info(f"Detected intent: '{intent}'")
     
-    # Generate response based on intent (pass recent history for context)
+       # Generate response based on intent (pass recent history for context)
     recent_history = history[-5:] if len(history) >= 5 else history
     print(f"Passing recent history length: {len(recent_history)}")  # Debug
     if intent == "capabilities":
-        ai_response = """I specialize in <strong>custom chatbots</strong> tailored for Upwork clients like you! Here's what I can build:<br><br>
+        ai_response = """I specialize in <strong>custom chatbots</strong> as a Upwork freelancer! Here's what I build for clients like you:<br><br>
 <ul>
-<li><strong>Empathetic Support Bots</strong>: Detects frustration (e.g., "Fees too high?") and responds with apologies + fixes—perfect for <em>fintech/ecom</em> (like our live demo).</li>
-<li><strong>Lead Gen Bots</strong>: For <a href="https://tesla.com" target="_blank">Tesla-style sales</a>—handles "Test drive?" with booking links + ZIP-based store finder.</li>
-<li><strong>Info/Query Bots</strong>: Quick facts on products/services (e.g., "Model 3 specs?") with dynamic data pulls.</li>
-<li><strong>Multi-Turn Convo Bots</strong>: Remembers context for seamless chats (e.g., "Follow up on that drive?").</li>
+<li><strong>Empathetic Support Bots</strong>: Detects frustration (e.g., "Fees too high?") and responds with fixes—perfect for <em>ecom/fintech</em> (live demo right here!).</li>
+<li><strong>Lead Gen Bots</strong>: Handles "Demo a bot?" with booking links + quick needs assessment.</li>
+<li><strong>Info/Query Bots</strong>: Pulls dynamic facts on your services/products.</li>
+<li><strong>Multi-Turn Convo Bots</strong>: Remembers context for seamless client chats.</li>
 </ul>
-Built with Python/Flask + OpenAI (<em>GPT-4o-mini for speed</em>). Scalable on Vercel/AWS. <strong>Starting at $300</strong>—let's customize for your niche! What's your project idea? 🚀"""
+Built with Python/Flask + OpenAI (fast & scalable on Vercel). <strong>Starting at $300</strong>—let's tailor one for your business! What's your main use case? 🚀"""
     elif intent == "pricing":
-        ai_response = """<strong>Transparent pricing</strong> for Upwork-quality bots:<br><br>
+        ai_response = """<strong>Upwork-friendly pricing</strong> for pro bots:<br><br>
 <table>
 <tr><th>Tier</th><th>Features</th><th>Price</th><th>Timeline</th></tr>
-<tr><td>Basic</td><td>Rule-based intents, simple responses, Vercel deploy</td><td>$250-500</td><td>3-5 days</td></tr>
-<tr><td>Pro</td><td>LLM-powered (OpenAI), sentiment/intent detection, multi-turn</td><td>$500-1k</td><td>1 week</td></tr>
-<tr><td>Custom</td><td>Tesla API integration, analytics, handover + support</td><td>$1k+</td><td>2 weeks</td></tr>
+<tr><td>Basic</td><td>Rule-based intents, simple UI, Vercel deploy</td><td>$250-500</td><td>3-5 days</td></tr>
+<tr><td>Pro</td><td>AI-powered (sentiment/intent), multi-turn memory</td><td>$500-1k</td><td>1 week</td></tr>
+<tr><td>Custom</td><td>Your API integrations, analytics, full handover</td><td>$1k+</td><td>2 weeks</td></tr>
 </table>
-Includes testing, docs, and 1-month tweaks. <em>100% satisfaction</em>—milestone payments. DM your specs for a <strong>free quote</strong>! 💰"""
+Milestone payments, 1-month support included. <em>5* reviews on Upwork</em>—DM for a <strong>free audit</strong> of your needs! 💰"""
     elif intent == "portfolio":
-        ai_response = """<strong>Check my work</strong>:<br><br>
+        ai_response = """<strong>My Upwork portfolio highlights</strong>:<br><br>
 <ul>
-<li><strong>Empathy Bot Demo</strong>: Live at <a href="[your-vercel-url]" target="_blank">your-vercel-url</a>—try "Frustrated with fees?" for real-time magic. GitHub: <a href="https://github.com/yourusername/empathetic-bot" target="_blank">github.com/yourusername/empathetic-bot</a>.</li>
-<li><strong>Tesla Lead Bot</strong>: Simulated test drive scheduler (code snippet on request).</li>
-<li><strong>Upwork Wins</strong>: 5* reviews for 3 bots (e.g., ecom query handler—boosted conversions <em>20%</em>).</li>
+<li><strong>Empathy Bot Demo</strong>: Live at <a href="[your-vercel-url]" target="_blank">your-vercel-url</a>—test "Frustrated with support?" for real magic. GitHub: <a href="https://github.com/AquinasRousseau/sentiment-chatbot-api" target="_blank">github.com/AquinasRousseau/sentiment-chatbot-api</a>.</li>
+<li><strong>Lead Gen Bot</strong>: Boosted client conversions 20%—code on request.</li>
+<li><strong>Client Wins</strong>: 3 bots for ecom/support, all 5* rated.</li>
 </ul>
-Full portfolio: <a href="[your-upwork-profile]" target="_blank">your-upwork-profile</a>. Let's build yours next—what's the vision? 📁"""
+Full profile: <a href="https://upwork.com/freelancers/~yourprofile" target="_blank">upwork.com/freelancers/~AquinasRousseau</a>. Ready to build yours? Share your project vibe! 📁"""
     elif intent == "test_drive":
-        ai_response = f'<em>Excited for your test drive</em>! Based on your <strong>{sentiment}</strong> vibe, let\'s get you behind the wheel. Enter your ZIP: <a href="https://www.tesla.com/drive" target="_blank">Schedule</a>. Pro tip: Ask about FSD upgrades! 🏎️'
+        ai_response = f'<em>Love demo requests</em>—based on your <strong>{sentiment}</strong> energy, let\'s schedule a quick bot walkthrough! Drop your email or needs: <a href="mailto:your-email@example.com?subject=Bot Demo Request" target="_blank">Email Me</a>. Pro tip: Mention "lead gen" for a custom sketch! 💬'
     elif intent == "info":
-        ai_response = "<strong>Happy to dive into Tesla details</strong>! For Model 3: <em>358 mi range</em>, <strong>$40k starting</strong>. More at <a href='https://tesla.com/model3' target='_blank'>tesla.com/model3</a>. What specifics?"
+        ai_response = "<strong>All about my bots</strong>! Key perks: <em>Real-time sentiment analysis</em>, <strong>under 2s responses</strong>, seamless Vercel hosting. Ideal for client-facing apps. More deets? <a href='https://github.com/AquinasRousseau/sentiment-chatbot-api' target='_blank'>GitHub Repo</a>. What's your top feature ask?"
     elif intent == "support":
-        ai_response = f"<em>I'm here to help</em>—sorry if you're <strong>{sentiment}</strong>! What's the issue? Quick fixes: Check app updates or reset via settings. Need more? 🔧"
+        ai_response = f"<em>Got your back</em>—sorry if you're <strong>{sentiment}</strong>! Bot glitch? Quick fixes: Refresh page or check console (F12). For custom help, hit me on Upwork. What's the snag? 🔧"
     else:  # general or upwork fallback
         ai_response = generate_response(user_message, sentiment, recent_history)
+       
     
     # Append bot response to history
     history.append({'role': 'bot', 'content': ai_response})
