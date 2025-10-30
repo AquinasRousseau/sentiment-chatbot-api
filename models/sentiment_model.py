@@ -1,18 +1,17 @@
 import os
-import time  # For rate-limit sleep
-from dotenv import load_dotenv
+from dotenv import load_dotenv  # Add this import
 from langchain_openai import ChatOpenAI
 from langchain.prompts import PromptTemplate
-import re
-import logging  # Structured logs for Vercel
+import re  # Assuming you have the updated version with regex
 
-load_dotenv()
+load_dotenv()  # Add this line—loads .env on import
 
+# Safety check (optional: prints if key missing)
 api_key = os.getenv('OPENAI_API_KEY')
 if not api_key:
     raise ValueError("OPENAI_API_KEY not found in .env! Get one from platform.openai.com/api-keys and add it.")
 
-llm = ChatOpenAI(api_key=api_key, model="gpt-4o-mini", temperature=0)
+llm = ChatOpenAI(api_key=api_key, model="gpt-4o-mini", temperature=0)  # Use the var for clarity
 
 prompt = PromptTemplate(
     input_variables=["text"],
@@ -36,44 +35,30 @@ Sentiment:"""
 chain = prompt | llm
 
 def analyze_sentiment(text):
-    sentiment = 'neutral'  # Default—always set
-    match = None  # Declare early: Fixes "not defined" scope error
     try:
         result = chain.invoke({"text": text})
         raw_output = result.content.strip()
-        logging.info(f"Raw LLM output for '{text}': '{raw_output}'")
+        # print(f"Raw LLM output for '{text}': '{raw_output}'")  # Uncomment for debug
         
-        # Robust extraction: Regex for sentiment (handles punctuation/trailing junk)
-        match = re.search(r'\b(positive|negative|neutral)[.!?]?\b', raw_output.lower())
+        # Robust extraction: Look for the sentiment word via regex (case-insensitive)
+        match = re.search(r'\b(positive|negative|neutral)\b', raw_output.lower())
         if match:
-            sentiment = match.group(1).strip(' .!?,')
-            logging.info(f"Regex extracted: '{sentiment}'")
+            return match.group(1)
+        
+        # Expanded fallback: Scan whole output for keywords
+        output_lower = raw_output.lower()
+        if any(word in output_lower for word in ['love', 'great', 'awesome', 'happy', 'pos']):
+            return 'positive'
+        elif any(word in output_lower for word in ['hate', 'bad', 'frustrated', 'angry', 'neg', 'issue', 'problem', 'confusing']):
+            return 'negative'
         else:
-            # Fallback: Keyword scan if regex misses (e.g., verbose LLM output)
-            output_lower = raw_output.lower()
-            if any(word in output_lower for word in ['love', 'great', 'awesome', 'happy', 'pos']):
-                sentiment = 'positive'
-            elif any(word in output_lower for word in ['hate', 'bad', 'frustrated', 'angry', 'neg', 'issue', 'problem', 'confusing']):
-                sentiment = 'negative'
-            else:
-                sentiment = 'neutral'
-            logging.info(f"Fallback extracted: '{sentiment}'")
-        
-        logging.info(f"Final sentiment for '{text}': '{sentiment}'")
-        
+            return 'neutral'  # Safe default
     except Exception as e:
-        logging.error(f"Sentiment error: {e}")
-        if "429" in str(e):  # Rate limit
-            logging.warning("Rate limited—sleeping 30s")
-            time.sleep(30)
-        sentiment = 'neutral'  # Safe default
-    
-    return sentiment
+        print(f"Sentiment error: {e}")  # For logs
+        return 'neutral'
 
-# Standalone test (local: python models/sentiment_model.py)
+# Standalone test (add if you want quick local check)
 if __name__ == "__main__":
-    print(analyze_sentiment("Love the new features!"))  # positive
+    print(analyze_sentiment("Love the new features!"))  # Expected: positive
     print(analyze_sentiment("How do I reset password?"))  # neutral
     print(analyze_sentiment("Fees too high—frustrated!"))  # negative
-
-
